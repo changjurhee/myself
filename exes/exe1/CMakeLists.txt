@@ -4,7 +4,7 @@ cmake_policy(SET CMP0016 NEW)
 
 
 set(SRC
-	main.cpp
+    main.cpp
 )
 
 set(RESOURCES
@@ -12,7 +12,7 @@ set(RESOURCES
 )
 
 set(OTHERS
-
+   ${BOOST_INCLUDE_DIR}
 )
 
 add_executable(${PROJECT_NAME} ${SRC} ${RESOURCES} ${OTHERS})
