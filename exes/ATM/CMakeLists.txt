@@ -1,4 +1,4 @@
-project(exe1)
+project(ATM)
 
 cmake_policy(SET CMP0016 NEW)
 
@@ -16,7 +16,7 @@ set(OTHERS
 
 add_executable(${PROJECT_NAME} ${SRC} ${RESOURCES} ${OTHERS})
 
-target_link_libraries(${PROJECT_NAME} dll1 ${Boost_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
 
 install(TARGETS ${PROJECT_NAME}
 	RUNTIME DESTINATION bin

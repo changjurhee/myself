@@ -12,6 +12,7 @@ set(VERSION_PATCH "0")
 set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
 add_definitions(-DDEF_RET_YES)
+
 include_directories(${PROJECT_SOURCE_DIR}/inc)
 link_directories(${PROJECT_SOURCE_DIR}/external/lib)
 
