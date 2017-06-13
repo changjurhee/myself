@@ -1,17 +1,9 @@
 #include "../../dlls/dll1/dll1.h"
-/*
-#include <boost/log/common.hpp>
-#include <boost/log/sinks.hpp>
-#include <boost/log/sources/logger.hpp>
-#include <boost/utility/empty_deleter.hpp>
-#include <boost/shared_ptr.hpp>
-*/
 #include <thread>
-#include <atomic>
+//#include <atomic>
 #include <iostream>
 
-//using namespace boost::log;
-
+/*
 std::atomic<int> x(0), y(0), z(0);
 std::atomic<bool> go(false);
 
@@ -67,27 +59,14 @@ void print(read_values* v)
     }
     std::cout<<std::endl;
 }
+*/
 
 int main(int argc, char *argv[])
 {
     dll1 iDll1;
     std::cout << iDll1.getText() << std::endl;
-    
-    /*
-    typedef sinks::asynchronous_sink<sinks::text_ostream_backend> text_sink;
-    boost::shared_ptr<text_sink> sink = boost::make_shared<text_sink>();
-    
-    boost::shared_ptr<std::ostream> stream {&std::clog, boost::empty_deleter{}};
-    sink->locked_backend()->add_stream(stream);
-    
-    core::get()->add_sink(sink);
-    
-    source::logger lg;
-    
-    BOOST_LOG(lg) << "note";
-    sink->flush();
-     */
 
+    /*
     std::thread t1(increment, &x, values1);
     std::thread t2(increment, &y, values2);
     std::thread t3(increment, &z, values3);
@@ -107,6 +86,7 @@ int main(int argc, char *argv[])
     print(values3);
     print(values4);
     print(values5);
+    */
     
     return 0;
 }
