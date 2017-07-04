@@ -1,5 +1,6 @@
-#include <stdlib>
 #include <iostream>
+/*
+#include <stdlib>
 
 void swap(int arr[], int left, int right)
 {
@@ -227,16 +228,16 @@ void print(int arr[], int n)
         std::cout << arr[i] << " ";
     
 }
+*/
 
 int main(int argc, char *argv[])
 {
     int arr[] = {170, 45, 75, 90, 802, 24, 2, 66};
     int n = sizeof(arr)/sizeof(arr[0]);
     
-    print(arr, n);
-    radixSort(arr, n);
-    print(arr, n);
-    
+    //print(arr, n);
+    //adixSort(arr, n);
+    //print(arr, n);
    
     return 0;
 }
