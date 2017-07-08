@@ -1,3 +1,5 @@
+// 15.1.1 Fixed Traits
+
 #ifndef ACCUM_HPP
 #define ACCUM_HPP
 

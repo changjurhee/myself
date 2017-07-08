@@ -12,7 +12,6 @@ set(SRC
     traits/accum3.hpp
     traits/accum5.hpp
     traits/accum6.hpp
-    traits/accum7.hpp
     traits/accum8.hpp
     traits/accumtraits2.hpp
     traits/accumtraits3.hpp
@@ -20,8 +19,23 @@ set(SRC
     traits/sumpolicy1.hpp
     traits/sumpolicy2.hpp
     traits/sumpolicy3.hpp
-    traits/sizeof.cpp
-    traits/elementtype.cpp
+    traits/isclasst.hpp
+    traits/apply1.hpp
+    traits/typeop1.hpp
+    traits/typeop2.hpp
+    traits/typeop3.hpp
+    traits/typeop4.hpp
+    traits/ifthenelse.hpp
+    traits/promote1.hpp
+    traits/promote2.hpp
+    traits/promote3.hpp
+    traits/promote4.hpp
+    traits/promotearray.hpp
+    traits/rparam.hpp
+    traits/rparamcls.hpp
+    traits/csmtraits.hpp
+    traits/csm1.hpp
+    traits/csm2.hpp
 )
 
 set(RESOURCES
