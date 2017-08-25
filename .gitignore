@@ -1,2 +1,7 @@
-#build results
-build/
+.DS_Store
+*.vim
+*.swp
+build/*
+
+##build results
+#build/
