@@ -24,12 +24,15 @@ set(RESOURCES
 )
 
 set(OTHERS
+    main.qml
 )
 
-add_executable(${PROJECT_NAME} ${SRC} ${RESOURCES} ${OTHERS})
+add_executable(${PROJECT_NAME} ${SRC} ${RESOURCES})
 target_link_libraries(${PROJECT_NAME} Qt5::Qml Qt5::Quick)
 
 install(TARGETS ${PROJECT_NAME}
 	RUNTIME DESTINATION bin
 	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib/static)
+
+install (FILES ${OTHERS} DESTINATION bin)

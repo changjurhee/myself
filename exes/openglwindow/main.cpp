@@ -55,11 +55,18 @@ static const char *vertexShaderSource =
 	"	gl_Position = matrix * posAttr;\n"
 	"}\n";
 
+static const char *fragmentShaderSource =
+    "varying lowp vec4 col;\n"
+    "void main() {\n"
+    "   gl_FragColor = col;\n"
+    "}\n";
+
 void TriangleWindow::initialize()
 {
 	m_program = new QOpenGLShaderProgram(this);
-	m_program->addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShaderSource);
-	m_program->addShaderFromSourceCode(QOpenGLShader::Fragment, vertexShaderSource);
+    m_program->addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShaderSource);
+	
+    m_program->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShaderSource);
 	m_program->link();
 	m_posAttr = m_program->attributeLocation("posAttr");
 	m_colAttr = m_program->attributeLocation("colAttr");
