@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/demos/stocqt">
+    <qresource prefix="/">
         <file>stocqt.qml</file>
         <file>content/qmldir</file>
         <file>content/Button.qml</file>
