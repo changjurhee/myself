@@ -12,9 +12,9 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
     
     MainModel mainModel;
     
-    viewer.rootContext()->setContextProperty("model", new MainViewModel(mainModel));
-    viewer.setMainQmlFile(QLatin1String("qml/QtQuickMvvmExample/MainView.qml"));
-    viewer.showExpanded();
+    //viewer.rootContext()->setContextProperty("model", new MainViewModel(mainModel));
+    //viewer.setMainQmlFile(QLatin1String("qml/QtQuickMvvmExample/MainView.qml"));
+    //viewer.showExpanded();
     
     return app->exec();
 }

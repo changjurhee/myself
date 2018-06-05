@@ -1,99 +1,218 @@
 import QtQuick 2.0
-import "stocqt.js" as JSLibrary
+import "."
 
-ListModel {
-	id: model
-	property string stockId: ""
-	property string stockName: ""
-	property bool ready: false
-	property real stockPrice: 0.0
-	property real stockPriceChanged: 0.0
+Rectangle {
+    id: root
+    width: 320
+    height: 410
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    color: "white"
 
-	signal dataReady
+    property string currentStockId: ""
+    property string currentStockName: ""
 
-	function indexOf(date){
-		if(model.count == 0)
-			return -1;
-		var newest = new Date(model.get(0).date);	
-		var oldest = new Date(model.get(model.count - 1).date);
+    ListView {
+        id: view
+        anchors.fill: parent
+        width: parent.width
+        clip: true
+        keyNavigationWraps: true
+        highlightMoveDuration: 0
+        focus: true
+        snapMode: ListView.SnapToItem
+        model: StockListModel{}
+        currentIndex: -1 // Don't pre-select any item
 
-		if(newest <= date) 
-			return -1;
+        function requestUrl(stockId) {
+            var endDate = new Date(""); //today
+            var startDate = new Date()
+            startDate.setDate(startDate.getDate() - 5);
 
-		if(oldest >= date)
-			return model.count -1 ;
+            var request = "http://ichart.finance.yahoo.com/table.csv?";
+            request += "s=" + stockId;
+            request += "&g=d";
+            request += "&a=" + startDate.getMonth();
+            request += "&b=" + startDate.getDate();
+            request += "&c=" + startDate.getFullYear();
+            request += "&d=" + endDate.getMonth();
+            request += "&e=" + endDate.getDate();
+            request += "&f=" + endDate.getFullYear();
+            request += "&g=d";
+            request += "&ignore=.csv";
+            return request;
+        }
 
-		var currDiff = 0;
-		var bestDiff = Math.abs(date.getTime() - newest.getTime());
-		var retval = 0;
-		
-		for(var i = 0; i< model.count; i++){
-			var d = new Date(model.get(i).date);
-			currDiff = Math.abs(d.getTime() - date.getTime());
-			if(currDiff < bestDiff){
-				bestDiff = currrDiff;
-				retval = i+1;
-			}
-			if(currDiff > bestDiff)
-				return retval;
-		}	
+        function getCloseValue(index) {
+            var req = requestUrl(model.get(index).stockId);
 
-		return -1;
-	}
+            if (!req)
+                return;
 
-	function createStockPrice(r) {
-		return {
-			"date": JSLibrary.parseDate(r[0]),
-			"open": r[1],
-			"high": r[2],
-			"low": r[3],
-			"close": r[4],
-			"volume": r[5],
-		};
-	}
+            var xhr = new XMLHttpRequest;
 
-	function updateStock() {
-		if(stockId == "")
-			return;
+            xhr.open("GET", req, true);
 
-		var startDate = new Date(2011, 4, 25);
-		var endDate = new Date(); // today
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.LOADING || xhr.readyState === XMLHttpRequest.DONE) {
+                    var records = xhr.responseText.split('\n');
+                    if (records.length > 0 && xhr.status == 200) {
+                        var r = records[1].split(',');
+                        var today = parseFloat(r[4]);
+                        model.setProperty(index, "value", today.toFixed(2));
 
-		var req = JSLibrary.requestUrl(stockId, startDate, endDate);
-		if(!req)
-			return;
+                        r = records[2].split(',');
+                        var yesterday = parseFloat(r[4]);
+                        var change = today - yesterday;
+                        if (change >= 0.0)
+                            model.setProperty(index, "change", "+" + change.toFixed(2));
+                        else
+                            model.setProperty(index, "change", change.toFixed(2));
 
-		var xhr = new XMLHttpRequest;
-		xhr.open("GET", req, true);
-		model.ready = false;
-		model.clear();
-		var i = 1; // skip the first line
-		xhr.onreadystatechange = function(){
-			if(xhr.readyState == XMLHttpRequest.LOADING || xhr.readyState == XMLHttpRequest.DONE)
-			{
-				var records = xhr.responseText.split('\n');
-				for(;i<records.length;i++)
-				{
-					var r = records[i[.split(',');
-					if(r.length == 6)
-						model.append(createStockPrice(r));
-				}
+                        var changePercentage = (change / yesterday) * 100.0;
+                        if (changePercentage >= 0.0)
+                            model.setProperty(index, "changePercentage", "+" + changePercentage.toFixed(2) + "%");
+                        else
+                            model.setProperty(index, "changePercentage", changePercentage.toFixed(2) + "%");
+                    } else {
+                        var unknown = "n/a";
+                        model.set(index, {"value": unknown, "change": unknown, "changePercentage": unknown});
+                    }
+                }
+            }
+            xhr.send()
+        }
 
-				if(xhr.readtState == XMLHttpRequest.DONE){
-					if(model.count > 0){
-						model.ready = true;
-						model.stockPrice = model.get(0).close;
-						model.stockPriceChanged = model.count > 1 ? (Math.round((model.stockPrice - model.get(1).close)*100)/100) : 0 ;
-					}
-					else{
-						model.stockPrice = 0;
-						model.stockPriceCHanged = 0;
-					}
+        onCurrentIndexChanged: {
+            if (currentItem) {
+                root.currentStockId = model.get(currentIndex).stockId;
+                root.currentStockName = model.get(currentIndex).name;
+            }
+        }
 
-					model.dataReady(); // emit signal - model.ready indicates whether the data is valid
-				}
-			}
-		}
-		xhr.send()
-	}
+        delegate: Rectangle {
+            height: 102
+            width: parent.width
+            color: "transparent"
+            MouseArea {
+                anchors.fill: parent;
+                onClicked: {
+                    if (view.currentIndex == index)
+                        mainRect.currentIndex = 1;
+                    else
+                        view.currentIndex = index;
+                }
+            }
+
+            Text {
+                id: stockIdText
+                anchors.top: parent.top
+                anchors.topMargin: 15
+                anchors.left: parent.left
+                anchors.leftMargin: 15
+                width: 125
+                height: 40
+                color: "#000000"
+                font.family: Settings.fontFamily
+                font.pointSize: 20
+                font.weight: Font.Bold
+                verticalAlignment: Text.AlignVCenter
+                text: stockId
+            }
+
+            Text {
+                id: stockValueText
+                anchors.top: parent.top
+                anchors.topMargin: 15
+                anchors.right: parent.right
+                anchors.rightMargin: 0.31 * parent.width
+                width: 190
+                height: 40
+                color: "#000000"
+                font.family: Settings.fontFamily
+                font.pointSize: 20
+                font.bold: true
+                horizontalAlignment: Text.AlignRight
+                verticalAlignment: Text.AlignVCenter
+                text: value
+                Component.onCompleted: view.getCloseValue(index);
+            }
+
+            Text {
+                id: stockValueChangeText
+                anchors.top: parent.top
+                anchors.topMargin: 15
+                anchors.right: parent.right
+                anchors.rightMargin: 20
+                width: 135
+                height: 40
+                color: "#328930"
+                font.family: Settings.fontFamily
+                font.pointSize: 20
+                font.bold: true
+                horizontalAlignment: Text.AlignRight
+                verticalAlignment: Text.AlignVCenter
+                text: change
+                onTextChanged: {
+                    if (parseFloat(text) >= 0.0)
+                        color = "#328930";
+                    else
+                        color = "#d40000";
+                }
+            }
+
+            Text {
+                id: stockNameText
+                anchors.top: stockIdText.bottom
+                anchors.left: parent.left
+                anchors.leftMargin: 15
+                width: 330
+                height: 30
+                color: "#000000"
+                font.family: Settings.fontFamily
+                font.pointSize: 16
+                font.bold: false
+                elide: Text.ElideRight
+                maximumLineCount: 1
+                verticalAlignment: Text.AlignVCenter
+                text: name
+            }
+
+            Text {
+                id: stockValueChangePercentageText
+                anchors.top: stockIdText.bottom
+                anchors.right: parent.right
+                anchors.rightMargin: 20
+                width: 120
+                height: 30
+                color: "#328930"
+                font.family: Settings.fontFamily
+                font.pointSize: 18
+                font.bold: false
+                horizontalAlignment: Text.AlignRight
+                verticalAlignment: Text.AlignVCenter
+                text: changePercentage
+                onTextChanged: {
+                    if (parseFloat(text) >= 0.0)
+                        color = "#328930";
+                    else
+                        color = "#d40000";
+                }
+            }
+
+            Rectangle {
+                id: endingLine
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                height: 1
+                width: parent.width
+                color: "#d7d7d7"
+            }
+        }
+
+        highlight: Rectangle {
+            width: view.width
+            color: "#eeeeee"
+        }
+    }
 }

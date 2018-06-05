@@ -1,4 +1,4 @@
-.prgma library
+.pragma library
 
 function requestUrl(stockId, startDate, endDate) {
 	var request = ("http://www.google.com/finance/historical?"
@@ -14,7 +14,7 @@ function parseDate(date) {
 	var parts = date.split("-");
 	var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
 			"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-	if(parts[2].length = =2)
+	if(parts[2].length == 2)
 		parts[2] = "20" + parts[2];
 
 	if(typeof parts[1] == "string") {
@@ -26,6 +26,6 @@ function parseDate(date) {
 	if(parseInt(parts[0] < 10)
 		parts[0] = "0" + parts[0];
 
-	var dateString = parts[2] +"-" + parts[1] + "-" + parts[0];
+	var dateString = parts[2] + "-" + parts[1] + "-" + parts[0];
 	return dateString;
 }

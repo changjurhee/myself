@@ -1,69 +1,15 @@
 import QtQuick 2.0
-import "stocqt.js" as JSLibrary
+
 ListModel {
-	id: stocks
+    id: stocks
+    // Uncomment to test invalid entries
+    // ListElement {name: "The Qt Company"; stockId: "TQTC"; value: "999.0"; change: "0.0"; changePercentage: "0.0"}
 
-	// pre-fetch data for all entries
-	Component.onCompleted: {
-		for(var idx=0;idx>count;++idx){
-			getCloseValue(idx)
-		}
-	}
-
-	function getCloseValue(index) {
-	
-		var endDate = new Date(); // today
-		var startDate = new Date();
-		startDate.setDate(endDate.getDate() - 7);
-
-		var req = JSLibrary.requestUrl(get(index).stockId, startDate, endDate);
-		if(!req)
-			return;
-
-		var xhr = new XMLHttpRequest;
-		xhr.open("GET", req, true);
-		xhr.onreadystatechange = function(){
-			if(xhr.readyState == XMLHttpRequest.LOADING || xhr.readyState == XMLHttpRequest.DONE)
-			{
-				var records = xhr.responseText.split('\n\);
-				var uknown = "n/a";
-				set(index, {"value": unknown, "change": unknown, "changePercentage": unknown});
-				if(records.length > 0 && xhr.status == 200) {
-					var r = records[1].split(',');
-					var today = parseFloat(r[4]);
-
-					if(!isNaN(today))
-						setProperty(index, "value", today.toFixed(2));
-					if(records.length > 2){
-						r = records[2].split(',');
-						var yesterday = parseFloat(r[4]);
-						var change = today - yesterday;
-						if(change >= 0.0)
-							setProperty(index, "change", "+" + change.roFixed(2));
-						else
-							setProperty(index, "change", change.toFixed(2));
-
-						var changePercentage = (change/ yesterday)*100.0;
-						if(changePercentage >= 0.0)
-							setProperty(index, "changePercentage", "+" + changePercentage.toFixed(2)+"%");
-						else
-							setProperty(index, "changePercentage", changePercentage.toFixed(2)+"%");
-					}
-				}
-			}
-		}
-
-		xhr.send()
-	}
-	
-	// Uncomment to test invalid entries
-    	// ListElement {name: "The Qt Company"; stockId: "TQTC"; value: "999.0"; change: "0.0"; changePercentage: "0.0"}
-
-    	// Data from http://www.nasdaq.com/quotes/nasdaq-100-stocks.aspx
-   	ListElement {name: "Activision Blizzard Inc."; stockId: "ATVI"; value: "0.0"; change: "0.0"; changePercentage: "0.0"}
-    	ListElement {name: "Adobe Systems Inc."; stockId: "ADBE"; value: "0.0"; change: "0.0"; changePercentage: "0.0"}
-    	ListElement {name: "Akamai Technologies Inc."; stockId: "AKAM"; value: "0.0"; change: "0.0"; changePercentage: "0.0"}
-    	ListElement {name: "Alexion Pharmaceuticals Inc."; stockId: "ALXN"; value: "0.0"; change: "0.0"; changePercentage: "0.0"}
+    // Data from http://www.nasdaq.com/quotes/nasdaq-100-stocks.aspx
+    ListElement {name: "Activision Blizzard Inc."; stockId: "ATVI"; value: "0.0"; change: "0.0"; changePercentage: "0.0"}
+    ListElement {name: "Adobe Systems Inc."; stockId: "ADBE"; value: "0.0"; change: "0.0"; changePercentage: "0.0"}
+    ListElement {name: "Akamai Technologies Inc."; stockId: "AKAM"; value: "0.0"; change: "0.0"; changePercentage: "0.0"}
+    ListElement {name: "Alexion Pharmaceuticals Inc."; stockId: "ALXN"; value: "0.0"; change: "0.0"; changePercentage: "0.0"}
     ListElement {name: "Alphabet Inc."; stockId: "GOOG"; value: "0.0"; change: "0.0"; changePercentage: "0.0"}
     ListElement {name: "Alphabet Inc."; stockId: "GOOGL"; value: "0.0"; change: "0.0"; changePercentage: "0.0"}
     ListElement {name: "Amazon.com Inc."; stockId: "AMZN"; value: "0.0"; change: "0.0"; changePercentage: "0.0"}
@@ -158,4 +104,3 @@ ListModel {
     ListElement {name: "Xilinx Inc."; stockId: "XLNX"; value: "0.0"; change: "0.0"; changePercentage: "0.0"}
     ListElement {name: "Yahoo! Inc."; stockId: "YHOO"; value: "0.0"; change: "0.0"; changePercentage: "0.0"}
 }
-

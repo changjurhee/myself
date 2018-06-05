@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>stocqt.qml</file>
+         <file>stocqt.qml</file>
         <file>content/qmldir</file>
         <file>content/Button.qml</file>
         <file>content/CheckBox.qml</file>
@@ -16,7 +16,5 @@
         <file>content/StockInfo.qml</file>
         <file>content/Settings.qml</file>
         <file>content/+windows/Settings.qml</file>
-        <file>content/StockListDelegate.qml</file>
-        <file>content/Banner.qml</file>
     </qresource>
 </RCC>
