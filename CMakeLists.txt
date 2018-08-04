@@ -32,6 +32,15 @@ set(CMAKE_CXX_STANDARD 11)
 # Normal Libraries & Executables
 #--
 
+set(Boost_NO_SYSTEM_PATHS TRUE) 
+if (Boost_NO_SYSTEM_PATHS)
+	set(BOOST_ROOT "/usr/local/Cellar/boost/1.67.0_1")
+  set(BOOST_INCLUDE_DIRS "${BOOST_ROOT}/include")
+  set(BOOST_LIBRARY_DIRS "${BOOST_ROOT}/lib")
+endif (Boost_NO_SYSTEM_PATHS)
+find_package(Boost REQUIRED regex date_time system filesystem thread graph program_options)
+include_directories(${BOOST_INCLUDE_DIRS})
+
 message("Binary Tree path : ${PROJECT_BINARY_DIR}") 
 message(“CMAKE_BUILD_TYPE = ${CMAKE_BUILD_TYPE}”)
  
