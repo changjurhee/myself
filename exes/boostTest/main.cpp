@@ -1,5 +1,5 @@
 //#define EX4_1
-#define EX25_1
+//#define EX25_1
 
 // ex4.1
 /*
@@ -41,6 +41,163 @@ int main(){
     std::cout << system.get_value<std::string>() << '\n';
 }
 */
+
+// Ex44.7 & Ex44.8 & Ex44.9 & Ex44.10 & Ex4.11
+#include <boost/thread.hpp>
+#include <boost/chrono.hpp>
+#include <iostream>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+
+boost::mutex cond_mutex;
+boost::condition_variable_any cond;
+std::vector<int> cond_random_numbers;
+
+void fill2()
+{
+    std::srand(static_cast<unsigned int>(std::time(0)));
+    for (int i = 0; i < 3; ++i) {
+        boost::unique_lock<boost::mutex> lock{cond_mutex};
+        cond_random_numbers.push_back(std::rand());
+        cond.notify_all();
+        cond.wait(cond_mutex);
+    }
+}
+
+void print2()
+{
+    std::size_t next_size = 1;
+    for (int i = 0; i < 3; ++i) {
+        boost::unique_lock<boost::mutex> lock{cond_mutex};
+        while (cond_random_numbers.size() != next_size) {
+            cond.wait(cond_mutex);
+        }
+        std::cout << cond_random_numbers.back() << '\n';
+        ++next_size;
+        cond.notify_all();
+    }
+}
+
+void wait(int seconds)
+{
+    boost::this_thread::sleep_for(boost::chrono::seconds(seconds));
+}
+
+boost::mutex mutex;
+boost::mutex exclusive_mutex;
+
+void thread()
+{
+    using boost::this_thread::get_id;
+    for (int i = 0; i < 5; ++i) {
+        wait(1);
+        boost::lock_guard<boost::mutex> lock{mutex};
+        std::cout << "Thread " << get_id() << ": " << i << std::endl;
+    }
+}
+
+void exclusive_thread()
+{
+    using boost::this_thread::get_id;
+    for (int i = 0; i < 5; ++i) {
+        wait(1);
+        exclusive_mutex.lock();
+        std::cout << "exclusive_thread " << get_id() << ": " << i << std::endl;
+        exclusive_mutex.unlock();
+    }
+}
+
+boost::timed_mutex time_mutex;
+
+void thread1()
+{
+    using boost::this_thread::get_id;
+    for (int i = 0; i < 5; ++i) {
+        wait(1);
+        boost::unique_lock<boost::timed_mutex> lock{time_mutex};
+        std::cout << "Thread 1 : " << get_id() << ": " << i << std::endl;
+        boost::timed_mutex *m = lock.release();
+        m->unlock();
+    }
+}
+
+void thread2()
+{
+    using boost::this_thread::get_id;
+    for (int i = 0; i < 5; ++i) {
+        wait(1);
+        boost::unique_lock<boost::timed_mutex> lock{time_mutex, boost::try_to_lock};
+        if(lock.owns_lock() || lock.try_lock_for(boost::chrono::seconds{1}))
+        {
+            std::cout << "Thread 2 : " << get_id() << ": " << i << std::endl;
+        }
+    }
+}
+
+boost::shared_mutex shared_mutex;
+std::vector<int> random_numbers;
+
+void fill()
+{
+    std::srand(static_cast<unsigned int>(std::time(0)));
+    for (int i = 0; i < 3; ++i)
+    {
+        boost::unique_lock<boost::shared_mutex> lock{shared_mutex};
+        int temp = std::rand();
+        std::cout << "fill thread : " << i << ", " << temp << '\n';
+        random_numbers.push_back(temp);
+        lock.unlock();
+        wait(1);
+    }
+}
+
+void print()
+{
+    for (int i = 0; i < 3; ++i)
+    {
+        wait(1);
+        boost::shared_lock<boost::shared_mutex> lock{shared_mutex};
+        std::cout << "print thread : " << i << ", " << random_numbers.back() << '\n';
+    }
+}
+
+int sum = 0;
+
+void count()
+{
+    for (int i = 0; i < 3; ++i)
+    {
+        wait(1);
+        boost::shared_lock<boost::shared_mutex> lock{shared_mutex};
+        sum += random_numbers.back();
+        std::cout << "count thread : " << i << ", " << sum << '\n';
+    }
+}
+
+int main()
+{
+    boost::thread t1(fill), t2(print), t3(count), t4(thread1), t5(thread2), t6(thread), t7(thread), t8(exclusive_thread), t9(exclusive_thread);
+    boost::thread t10(fill2), t11(print2);
+    
+    t1.join();
+    t2.join();
+    t3.join();
+    t4.join();
+    t5.join();
+    t6.join();
+    t7.join();
+    t8.join();
+    t9.join();
+    t10.join();
+    t11.join();
+    
+    std::cout << "Sum : " << sum << '\n';
+}
+
+/*
+//#define EX25_2
+#ifndef EX25_2
 
 // ex ; json file read
 #include <boost/property_tree/ptree.hpp>
@@ -165,3 +322,5 @@ int main(){
     pt::write_json("modify.json", root);
     
 }
+*/
+
