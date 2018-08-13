@@ -43,12 +43,35 @@ int main(){
 */
 
 // Ex44.7 & Ex44.8 & Ex44.9 & Ex44.10 & Ex4.11
+#define BOOST_THREAD_PROVIDES_FUTURE
 #include <boost/thread.hpp>
+#include <boost/thread/future.hpp>
 #include <boost/chrono.hpp>
+#include <functional>
 #include <iostream>
 #include <vector>
 #include <cstdlib>
 #include <ctime>
+#include <utility>
+
+void accumulate(boost::promise<int> &p){
+    int sum =0 ;
+    for(int i=0; i< 5; ++i)
+    {
+        sum += i;
+    }
+    
+    p.set_value(sum);
+}
+int accumulate2(){
+    int sum =0 ;
+    for(int i=0; i< 5; ++i)
+    {
+        sum += i;
+    }
+    
+    return sum;
+}
 
 boost::mutex cond_mutex;
 boost::condition_variable_any cond;
@@ -175,10 +198,52 @@ void count()
     }
 }
 
+// EX44.12 & EX44.13
+
+boost::mutex TLS_mutex, TLS_mutex2;
+
+void init(){
+    static bool done(false);
+    boost::lock_guard<boost::mutex> lock(TLS_mutex);
+    if(!done){
+        done = true;
+        std::cout << "done : " << done << '\n';
+    }
+    else{
+        std::cout << "done : " << done << '\n';
+    }
+}
+
+void TLS_init(){
+    static boost::thread_specific_ptr<bool> tls;
+    if(!tls.get()){
+        tls.reset(new bool(true));
+        boost::lock_guard<boost::mutex> lock{TLS_mutex2};
+        std::cout << "tls done" << '\n';
+    }
+}
+
+void TLS_thread(){
+    init();
+    init();
+}
+
+void TLS2_thread(){
+    TLS_init();
+    TLS_init();
+}
+
 int main()
 {
     boost::thread t1(fill), t2(print), t3(count), t4(thread1), t5(thread2), t6(thread), t7(thread), t8(exclusive_thread), t9(exclusive_thread);
     boost::thread t10(fill2), t11(print2);
+    boost::thread t[3];
+    boost::thread tt[3];
+    
+    for(int i=0;i<3;i++){
+        t[i] = boost::thread{TLS_thread};
+        tt[i] = boost::thread{TLS2_thread};
+    }
     
     t1.join();
     t2.join();
@@ -192,7 +257,25 @@ int main()
     t10.join();
     t11.join();
     
+    for(int i=0; i<3; i++){
+        t[i].join();
+        tt[i].join();
+    }
+    
     std::cout << "Sum : " << sum << '\n';
+    
+    boost::promise<int> p;
+    boost::future<int> f = p.get_future();
+    boost::thread ft{accumulate, std::ref(p)};
+    std::cout << "future sum : " << f.get() << std::endl;
+
+    boost::packaged_task<int> task{accumulate2};
+    boost::future<int> ff = task.get_future();
+    boost::thread ftt{std::move(task)};
+    std::cout << "packaged task sum : " << ff.get() << std::endl;
+    
+    boost::future<int> fasync = boost::async(accumulate2);
+    std::cout << "future async sum : " << fasync.get() << std::endl;
 }
 
 /*
