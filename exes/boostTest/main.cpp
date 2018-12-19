@@ -233,8 +233,28 @@ void TLS2_thread(){
     TLS_init();
 }
 
+#include <deque>
+#include <algorithm>
+#include <boost/spirit/include/qi.hpp>
+#include <string>
+#include <boost/swap.hpp>
+
+using namespace boost::spirit;
+
+
 int main()
 {
+    double a1(-5.0);
+    double a2(5.0);
+    
+    double direction = (0 % 2) ? 1.0 : -1.0 ;
+    std::cout << a1 << ", " << a2 << ", " << direction << std::endl;
+    
+    boost::swap(a1, a2);
+    
+    direction = (1 % 2) ? 1.0 : -1.0 ;
+    std::cout << a1 << ", " << a2 << ", " << direction << std::endl;
+    
     boost::thread t1(fill), t2(print), t3(count), t4(thread1), t5(thread2), t6(thread), t7(thread), t8(exclusive_thread), t9(exclusive_thread);
     boost::thread t10(fill2), t11(print2);
     boost::thread t[3];
@@ -276,6 +296,39 @@ int main()
     
     boost::future<int> fasync = boost::async(accumulate2);
     std::cout << "future async sum : " << fasync.get() << std::endl;
+    
+    std::deque<int> coll = { 1,3,19,5,13,7,11,2,17};
+    int x(5), y(12);
+    
+    auto pos = std::find_if(coll.cbegin(), coll.cend(),
+        [=](int i){
+            return i >x && i <y ;
+        });
+    
+    auto qqq = [x, &y] {
+        std::cout << "x: " << x << std::endl;
+        std::cout << "y: " << y << std::endl;
+        ++y;
+    };
+    
+    std::cout << "first elem >5 and <12 : " << *pos << std::endl;
+    
+    x = 12;
+    
+    qqq();
+    qqq();
+    
+    std::cout << "final y: " << y << std::endl;
+    
+    std::string s;
+    std::getline(std::cin, s);
+    auto it = s.begin();
+    bool match = qi::parse(it, s.end(), ascii::digit);
+    bool match2 = qi::phrase_parse(it, s.end(), ascii::digit, ascii::space, qi::skip_flag::dont_postskip);
+    std::cout << std::boolalpha << match << ", " << match2 << std::endl;
+    if(it != s.end()){
+        std::cout << std::string{it, s.end()} << std::endl;
+    }
 }
 
 /*

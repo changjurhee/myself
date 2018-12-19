@@ -222,13 +222,15 @@ int binarySearchRecursive(int a[], int x, int low, int high)
     }
 }
 
+
+*/
+
 void print(int arr[], int n)
 {
     for(int i = 0; i < n; i++)
         std::cout << arr[i] << " ";
     
 }
-*/
 
 int main(int argc, char *argv[])
 {
@@ -237,7 +239,7 @@ int main(int argc, char *argv[])
     
     //print(arr, n);
     //adixSort(arr, n);
-    //print(arr, n);
+    print(arr, n);
    
     return 0;
 }
