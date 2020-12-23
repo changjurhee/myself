@@ -34,7 +34,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(Boost_NO_SYSTEM_PATHS TRUE) 
 if (Boost_NO_SYSTEM_PATHS)
-	set(BOOST_ROOT "/usr/local/Cellar/boost/1.67.0_1")
+	set(BOOST_ROOT "/usr/local/Cellar/boost/1.68.0_1")
   set(BOOST_INCLUDE_DIRS "${BOOST_ROOT}/include")
   set(BOOST_LIBRARY_DIRS "${BOOST_ROOT}/lib")
 endif (Boost_NO_SYSTEM_PATHS)
